@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+
+  <meta charset="utf-8">
+  <title>Owner Dashboard</title>
+</head>
+<body>
+  <h2>Welcome to Your Dashboard</h2>
+  <p>Your client form link:</p>
+  <p id="shareLink" style="font-weight:bold;color:blue;"></p>
+
+  <h3>Your Clients</h3>
+  <ul id="clientList"></ul>
+
+  <button id="logout">Logout</button>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const clientList = document.getElementById("clientList");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Generate shareable link
+      const formLink = `${window.location.origin}/client-form.html?owner=${user.uid}`;
+      document.getElementById("shareLink").textContent = formLink;
+
+      // Fetch client data
+      const snapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
+      clientList.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        li.textContent = `${data.name} - ${data.email}`;
+        clientList.appendChild(li);
+      });
+    });
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

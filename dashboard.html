@@ -29,24 +29,23 @@
       return;
     }
 
-    // ✅ Generate the owner’s personal link
-    const baseUrl = window.location.origin;  // this gives https://francis2150.github.io
-    const repoName = window.location.pathname.split("/")[1]; // this gives "trial"
+    // ✅ Generate link using *this logged-in user's* UID
+    const repoName = window.location.pathname.split("/")[1];
+    const baseUrl = window.location.origin;
     const formLink = `${baseUrl}/${repoName}/client-form.html?owner=${user.uid}`;
 
-    // ✅ Display the link on dashboard
     shareLinkElement.innerHTML = `
+      <p><strong>Your client form link:</strong></p>
       <a href="${formLink}" target="_blank">${formLink}</a>
       <button id="copyLink">Copy</button>
     `;
 
-    // ✅ Copy link button
     document.getElementById("copyLink").addEventListener("click", () => {
       navigator.clipboard.writeText(formLink);
-      alert("Link copied to clipboard!");
+      alert("Link copied!");
     });
 
-    // ✅ Load client list for this user
+    // ✅ Load clients for *this* user only
     const snapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
     clientList.innerHTML = "";
     snapshot.forEach(doc => {

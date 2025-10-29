@@ -13,33 +13,34 @@
     <input type="email" id="email" placeholder="Email" required><br>
     <button type="submit">Submit</button>
   </form>
+<script type="module">
+  import { db } from "./firebase.js";
+  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  <script type="module">
-    import { db } from "./firebase.js";
-    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  const urlParams = new URLSearchParams(window.location.search);
+  const ownerUid = urlParams.get("owner");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const ownerUid = urlParams.get("owner");
+  document.getElementById("clientForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    document.getElementById("clientForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
+    if (!ownerUid) {
+      alert("Invalid or missing owner link!");
+      return;
+    }
 
-      if (!ownerUid) {
-        alert("Invalid form link.");
-        return;
-      }
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
 
-      await addDoc(collection(db, "owners", ownerUid, "clients"), {
-        name,
-        email,
-        submittedAt: new Date()
-      });
-
-      alert("Your details were submitted successfully!");
-      e.target.reset();
+    await addDoc(collection(db, "owners", ownerUid, "clients"), {
+      name,
+      email,
+      submittedAt: new Date()
     });
-  </script>
+
+    alert("Your information has been submitted successfully!");
+    e.target.reset();
+  });
+</script>
+
 </body>
 </html>

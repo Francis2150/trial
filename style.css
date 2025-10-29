@@ -1,0 +1,109 @@
+/* ====== GLOBAL STYLES ====== */
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f7f9fb;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 15px;
+}
+
+/* ====== HEADER ====== */
+h2, h3 {
+  color: #222;
+  margin-bottom: 20px;
+}
+
+/* ====== FORM STYLES ====== */
+form {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+/* ====== BUTTONS ====== */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #4a90e2;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: #357ab8;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* ====== DASHBOARD ====== */
+#shareLink {
+  background: #eaf3ff;
+  padding: 10px 15px;
+  border-radius: 10px;
+  word-wrap: break-word;
+  max-width: 90%;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 380px;
+}
+
+ul li {
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 480px) {
+  body {
+    padding: 20px 10px;
+  }
+  form {
+    padding: 20px;
+  }
+}

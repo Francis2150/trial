@@ -1,46 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="style.css">
-
   <meta charset="utf-8">
   <title>Client Form</title>
 </head>
 <body>
-  <h2>Submit Your Details</h2>
+  <h2>Client Information Form</h2>
   <form id="clientForm">
-    <input type="text" id="name" placeholder="Full Name" required><br>
-    <input type="email" id="email" placeholder="Email" required><br>
+    <input id="name" placeholder="Full Name" required>
+    <input id="email" type="email" placeholder="Email" required>
     <button type="submit">Submit</button>
   </form>
-<script type="module">
-  import { db } from "./firebase.js";
-  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const ownerUid = urlParams.get("owner");
+  <script type="module">
+    import { db } from "./firebase.js";
+    import { collection, addDoc, getDocs, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  document.getElementById("clientForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    const urlParams = new URLSearchParams(window.location.search);
+    const customId = urlParams.get("owner");
 
-    if (!ownerUid) {
-      alert("Invalid or missing owner link!");
-      return;
+    if (!customId) {
+      document.body.innerHTML = "<h3>Invalid link. Please check the URL.</h3>";
+      throw new Error("Missing owner ID");
     }
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
+    document.getElementById("clientForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    await addDoc(collection(db, "owners", ownerUid, "clients"), {
-      name,
-      email,
-      submittedAt: new Date()
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+
+      // Find correct owner by customId
+      const ownersSnapshot = await getDocs(query(collection(db, "owners"), where("customId", "==", customId)));
+      if (ownersSnapshot.empty) {
+        alert("Invalid owner link!");
+        return;
+      }
+
+      const ownerDoc = ownersSnapshot.docs[0];
+      const ownerUid = ownerDoc.id;
+
+      await addDoc(collection(db, "owners", ownerUid, "clients"), {
+        name,
+        email,
+        submittedAt: new Date()
+      });
+
+      alert("Form submitted successfully!");
+      e.target.reset();
     });
-
-    alert("Your information has been submitted successfully!");
-    e.target.reset();
-  });
-</script>
-
+  </script>
 </body>
 </html>
+

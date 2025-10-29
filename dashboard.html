@@ -1,67 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="style.css">
-
   <meta charset="utf-8">
   <title>Owner Dashboard</title>
 </head>
 <body>
-  <h2>Welcome to Your Dashboard</h2>
-  <p>Your client form link:</p>
-  <p id="shareLink" style="font-weight:bold;color:blue;"></p>
-
+  <h2>Welcome to your Dashboard</h2>
+  <div id="profile"></div>
+  <div id="shareLink"></div>
   <h3>Your Clients</h3>
   <ul id="clientList"></ul>
-
   <button id="logout">Logout</button>
-<script type="module">
-  import { auth, db } from "./firebase.js";
-  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const shareLinkElement = document.getElementById("shareLink");
-  const clientList = document.getElementById("clientList");
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "index.html";
-      return;
-    }
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
 
-    // ✅ Generate link using *this logged-in user's* UID
-    const repoName = window.location.pathname.split("/")[1];
-    const baseUrl = window.location.origin;
-    const formLink = `${baseUrl}/${repoName}/client-form.html?owner=${user.uid}`;
+      // Fetch owner profile
+      const ownerDoc = await getDoc(doc(db, "owners", user.uid));
+      if (!ownerDoc.exists()) {
+        alert("Owner record not found!");
+        return;
+      }
 
-    shareLinkElement.innerHTML = `
-      <p><strong>Your client form link:</strong></p>
-      <a href="${formLink}" target="_blank">${formLink}</a>
-      <button id="copyLink">Copy</button>
-    `;
+      const ownerData = ownerDoc.data();
 
-    document.getElementById("copyLink").addEventListener("click", () => {
-      navigator.clipboard.writeText(formLink);
-      alert("Link copied!");
+      // Profile section
+      const createdDate = ownerData.createdAt ? ownerData.createdAt.toDate().toLocaleString() : "N/A";
+      document.getElementById("profile").innerHTML = `
+        <h3>My Profile</h3>
+        <p><b>Name:</b> ${ownerData.name}</p>
+        <p><b>Email:</b> ${ownerData.email}</p>
+        <p><b>Signup Date:</b> ${createdDate}</p>
+      `;
+
+      // Generate unique client form link
+      const repoName = window.location.pathname.split("/")[1];
+      const baseUrl = window.location.origin;
+      const formLink = `${baseUrl}/${repoName}/client-form.html?owner=${ownerData.customId}`;
+
+      document.getElementById("shareLink").innerHTML = `
+        <h3>Your Client Form Link:</h3>
+        <a href="${formLink}" target="_blank">${formLink}</a>
+        <button id="copyLink">Copy Link</button>
+      `;
+
+      document.getElementById("copyLink").addEventListener("click", () => {
+        navigator.clipboard.writeText(formLink);
+        alert("Link copied!");
+      });
+
+      // Fetch clients
+      const clientList = document.getElementById("clientList");
+      clientList.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
+      querySnapshot.forEach(docSnap => {
+        const c = docSnap.data();
+        const li = document.createElement("li");
+        li.textContent = `${c.name} — ${c.email}`;
+        clientList.appendChild(li);
+      });
+
+      document.getElementById("logout").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "index.html";
+      });
     });
-
-    // ✅ Load clients for *this* user only
-    const snapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
-    clientList.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const li = document.createElement("li");
-      li.textContent = `${data.name} - ${data.email}`;
-      clientList.appendChild(li);
-    });
-  });
-
-  // ✅ Logout
-  document.getElementById("logout").addEventListener("click", async () => {
-    await signOut(auth);
-    window.location.href = "index.html";
-  });
-</script>
-
+  </script>
 </body>
 </html>

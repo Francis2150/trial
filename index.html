@@ -1,42 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="style.css">
   <meta charset="utf-8">
-  <title>Owner Login - Easy Registration</title>
+  <title>EasyRegistrationForms — Login/Signup</title>
 </head>
 <body>
-  <h2>Owner Login / Sign Up</h2>
-  <form id="authForm">
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
-    <button type="submit" id="loginBtn">Login</button>
-    <button type="button" id="signupBtn">Sign Up</button>
-  </form>
+  <h2>Login or Signup</h2>
+  <input id="name" placeholder="Full Name (only for signup)">
+  <input id="email" placeholder="Email" type="email">
+  <input id="password" placeholder="Password" type="password">
+  <button id="signupBtn">Sign Up</button>
+  <button id="loginBtn">Log In</button>
 
   <script type="module">
-    import { auth } from "./firebase.js";
-    import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { auth, db } from "./firebase.js";
+    import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const signupBtn = document.getElementById('signupBtn');
-    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
 
-    signupBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("Signup successful!");
+    signupBtn.addEventListener("click", async () => {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!name || !email || !password) return alert("All fields required for signup");
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+
+        const emailSuffix = email.slice(-3).replace(/[^a-zA-Z0-9]/g, ""); // clean up last 3 chars
+        const shortName = name.split(" ")[0].toLowerCase();
+        const customId = `${shortName}_${emailSuffix}_${userCredential.user.uid.slice(0,6)}`;
+
+        await setDoc(doc(db, "owners", userCredential.user.uid), {
+          name,
+          email,
+          customId,
+          createdAt: serverTimestamp()
+        });
+
+        alert("Signup successful!");
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert(err.message);
+      }
     });
 
-    loginBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful!");
-      window.location.href = "dashboard.html";
+    loginBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert(err.message);
+      }
     });
   </script>
 </body>

@@ -1,109 +1,112 @@
-/* ====== GLOBAL STYLES ====== */
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* General page setup */
 body {
-  font-family: "Poppins", sans-serif;
-  background: #f7f9fb;
+  font-family: 'Poppins', sans-serif;
+  background: #f4f6f9;
   color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
   margin: 0;
-  padding: 40px 15px;
-}
-
-/* ====== HEADER ====== */
-h2, h3 {
-  color: #222;
-  margin-bottom: 20px;
-}
-
-/* ====== FORM STYLES ====== */
-form {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 380px;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+/* Container box */
+.container {
+  background: #fff;
+  margin-top: 60px;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 95%;
+  max-width: 480px;
+}
+
+/* Headings */
+h2, h3 {
+  text-align: center;
+  color: #222;
+}
+
+/* Input fields */
+input {
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 15px;
   transition: border-color 0.2s;
 }
 
 input:focus {
-  border-color: #4a90e2;
+  border-color: #007bff;
   outline: none;
 }
 
-/* ====== BUTTONS ====== */
+/* Buttons */
 button {
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background-color: #4a90e2;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #007bff;
   color: white;
-  font-weight: bold;
-  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #357ab8;
+  background: #0056b3;
 }
 
-button:active {
-  transform: scale(0.98);
-}
-
-/* ====== DASHBOARD ====== */
-#shareLink {
-  background: #eaf3ff;
-  padding: 10px 15px;
-  border-radius: 10px;
-  word-wrap: break-word;
-  max-width: 90%;
-  text-align: center;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
+/* Dashboard sections */
+#profile, #shareLink, #clientList {
   margin-top: 20px;
-  width: 100%;
-  max-width: 380px;
-}
-
-ul li {
-  background: #fff;
+  padding: 15px;
   border-radius: 10px;
-  margin-bottom: 10px;
-  padding: 12px 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: #fafafa;
+  border: 1px solid #eee;
 }
 
-/* ====== RESPONSIVE ====== */
-@media (max-width: 480px) {
-  body {
-    padding: 20px 10px;
+#clientList {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+#clientList li {
+  padding: 8px;
+  background: #f0f3f6;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+/* Copy button */
+#copyLink {
+  display: inline-block;
+  margin-left: 10px;
+  width: auto;
+  background: #28a745;
+}
+
+#copyLink:hover {
+  background: #1d8135;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 25px;
   }
-  form {
-    padding: 20px;
+  h2, h3 {
+    font-size: 20px;
+  }
+  input, button {
+    font-size: 14px;
   }
 }

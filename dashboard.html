@@ -15,39 +15,54 @@
   <ul id="clientList"></ul>
 
   <button id="logout">Logout</button>
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  <script type="module">
-    import { auth, db } from "./firebase.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  const shareLinkElement = document.getElementById("shareLink");
+  const clientList = document.getElementById("clientList");
 
-    const clientList = document.getElementById("clientList");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      // Generate shareable link
-      const formLink = `${window.location.origin}/client-form.html?owner=${user.uid}`;
-      document.getElementById("shareLink").textContent = formLink;
-
-      // Fetch client data
-      const snapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
-      clientList.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const li = document.createElement("li");
-        li.textContent = `${data.name} - ${data.email}`;
-        clientList.appendChild(li);
-      });
-    });
-
-    document.getElementById("logout").addEventListener("click", async () => {
-      await signOut(auth);
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
       window.location.href = "index.html";
+      return;
+    }
+
+    // ✅ Generate the owner’s personal link
+    const baseUrl = window.location.origin;  // this gives https://francis2150.github.io
+    const repoName = window.location.pathname.split("/")[1]; // this gives "trial"
+    const formLink = `${baseUrl}/${repoName}/client-form.html?owner=${user.uid}`;
+
+    // ✅ Display the link on dashboard
+    shareLinkElement.innerHTML = `
+      <a href="${formLink}" target="_blank">${formLink}</a>
+      <button id="copyLink">Copy</button>
+    `;
+
+    // ✅ Copy link button
+    document.getElementById("copyLink").addEventListener("click", () => {
+      navigator.clipboard.writeText(formLink);
+      alert("Link copied to clipboard!");
     });
-  </script>
+
+    // ✅ Load client list for this user
+    const snapshot = await getDocs(collection(db, "owners", user.uid, "clients"));
+    clientList.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const li = document.createElement("li");
+      li.textContent = `${data.name} - ${data.email}`;
+      clientList.appendChild(li);
+    });
+  });
+
+  // ✅ Logout
+  document.getElementById("logout").addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
+</script>
+
 </body>
 </html>
